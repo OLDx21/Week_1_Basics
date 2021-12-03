@@ -1,10 +1,13 @@
 import java.util.ArrayList;
 
 public class KnightsTourProblem {
+
   private static final String DOWN = "down";
+
   private static final String RISE = "rise";
 
-  ArrayList<Integer> listOfMoves = new ArrayList<>();
+  ArrayList<Coordinates> listOfMoves = new ArrayList<>();
+
   int column = 0;
 
   public static void main(String[] args) {
@@ -22,20 +25,25 @@ public class KnightsTourProblem {
       }
     }
     goDown(board);
+    char letter;
 
-    System.out.println(listOfMoves);
+    for (Coordinates coord : listOfMoves) {
+      letter = (char) (65 + coord.getxCoord());
+      System.out.print("<" + letter + ">" + "<" + coord.getyCoord() + ">; ");
+    }
+
   }
 
   void goDown(int[][] board) {
     for (int yCoord = 0; yCoord < 8; yCoord++) {
-      listOfMoves.add(board[yCoord][column]);
+      listOfMoves.add(new Coordinates(column, yCoord + 1));
     }
     turnRight(RISE, board);
   }
 
   void riseUp(int[][] board) {
     for (int yCoord = 7; yCoord >= 0; yCoord--) {
-      listOfMoves.add(board[yCoord][column]);
+      listOfMoves.add(new Coordinates(column, yCoord + 1));
     }
     turnRight(DOWN, board);
   }
