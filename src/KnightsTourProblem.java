@@ -32,6 +32,16 @@ public class KnightsTourProblem {
       System.out.print("<" + letter + ">" + "<" + coord.getyCoord() + ">; ");
     }
 
+    // Вывод доски
+    System.out.println("\n"+"------------------------------------------------------");
+    for (int i = 0; i < 8; i++) {
+      for (int j = 0; j < 8; j++) {
+        letter = (char) (65 + j);
+        System.out.print("<" + letter + ">" + "<" + (i+1) + ">; ");
+      }
+      System.out.println();
+    }
+
   }
 
   //ход вниз
