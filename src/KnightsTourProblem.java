@@ -1,75 +1,80 @@
-import java.util.ArrayList;
+
+import java.util.TreeMap;
 
 public class KnightsTourProblem {
 
-  private static final String DOWN = "down";
-
-  private static final String RISE = "rise";
-
   //список, который хранит последовательность ходов
-  ArrayList<Coordinates> listOfMoves = new ArrayList<>();
-
-  int column = 0;
+  TreeMap<Integer, Coordinates> coordinatesTreeMap = new TreeMap<>();
 
   public static void main(String[] args) {
     KnightsTourProblem knightsTourProblem = new KnightsTourProblem();
     knightsTourProblem.filldata();
   }
 
-  //метод для создание матрицы, стартового хода и вывода результата
+  //метод для создание матрицы, и старта коня
   void filldata() {
     //Создание матрицы
     int[][] board = new int[8][8];
+    //Установка стартовой позиции коня
+    int xCoord = 0, yCoord = 0;
+    board[yCoord][xCoord] = 1;
+    coordinatesTreeMap.put(0, new Coordinates(0, 0));
+    //все возможные ходы коня
+    int[][] all = {{1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}};
 
-    //Стартовый ход
-    goDown(board);
-
-    char letter;
-
+    recFindPos(xCoord, yCoord, 1, all, board);
     //Вывод результата
-    for (Coordinates coord : listOfMoves) {
+    char letter;
+    for (Coordinates coord : coordinatesTreeMap.values()) {
       letter = (char) (65 + coord.getxCoord());
-      System.out.print("<" + letter + ">" + "<" + coord.getyCoord() + ">; ");
+      System.out.print("<" + letter + ">" + "<" + (coord.getyCoord() + 1) + ">; ");
     }
-
-    // Вывод доски
-    System.out.println("\n"+"------------------------------------------------------");
+    //Вывод доски
+    System.out.println("\n" + "------------------------------------------------------");
     for (int i = 0; i < 8; i++) {
       for (int j = 0; j < 8; j++) {
         letter = (char) (65 + j);
-        System.out.print("<" + letter + ">" + "<" + (i+1) + ">; ");
+        System.out.print("<" + letter + ">" + "<" + (i + 1) + ">; ");
       }
       System.out.println();
     }
 
   }
 
-  //ход вниз
-  void goDown(int[][] board) {
-    for (int yCoord = 0; yCoord < 8; yCoord++) {
-      listOfMoves.add(new Coordinates(column, yCoord + 1));
+  /**
+   * Рекурсивный метод, который ставит коня на next_x next_y координаты, и сразу после этого ставит следующего коня и подбирает ему ход,
+   * если для следующего коня не находится ход, то ход действующего коня обнуляется, и ему подбирается другой ход
+   */
+
+  private boolean recFindPos(int x, int y, int movei, int[][] all, int[][] board) {
+    int next_x, next_y;
+    if (movei == 64) {
+      for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+          coordinatesTreeMap.put(board[i][j], new Coordinates(j, i));
+        }
+      }
+      return true;
     }
-    turnRight(RISE, board);
+    for (int k = 0; k < 8; k++) {
+      next_x = x + all[k][1];
+      next_y = y + all[k][0];
+      if (isSafe(next_x, next_y, board)) {
+        board[next_x][next_y] = movei;
+        if (recFindPos(next_x, next_y, movei + 1, all, board))
+          return true;
+        else
+          board[next_x][next_y] = 0;
+      }
+    }
+    return false;
   }
 
-  //ход вверх
-  void riseUp(int[][] board) {
-    for (int yCoord = 7; yCoord >= 0; yCoord--) {
-      listOfMoves.add(new Coordinates(column, yCoord + 1));
-    }
-    turnRight(DOWN, board);
-  }
+  /**
+   * метод, определяющий, можно ли ставить коня на координаты x,y
+   */
 
-  //ход в сторону, для определения в какую именно, создана переменная direction, и константы RISE и DOWN
-  void turnRight(String direction, int[][] board) {
-    if (column == 7) {
-      return;
-    }
-    column += 1;
-    if (direction.equals(RISE)) {
-      riseUp(board);
-    } else {
-      goDown(board);
-    }
+  private boolean isSafe(int x, int y, int[][] board) {
+    return x >= 0 && x < 8 && y >= 0 && y < 8 && board[x][y] == 0;
   }
 }
