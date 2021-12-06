@@ -2,27 +2,28 @@
 import java.util.TreeMap;
 
 public class KnightsTourProblem {
-
   //список, который хранит последовательность ходов
   TreeMap<Integer, Coordinates> coordinatesTreeMap = new TreeMap<>();
 
   public static void main(String[] args) {
     KnightsTourProblem knightsTourProblem = new KnightsTourProblem();
-    knightsTourProblem.filldata();
+    Coordinates coordinates = knightsTourProblem.getRandomCoord();
+    knightsTourProblem.fillData(coordinates.getxCoord(), coordinates.getyCoord());
+
   }
 
   //метод для создание матрицы, и старта коня
-  void filldata() {
+  void fillData(int x, int y) {
+    System.out.println(y + " " + x);
     //Создание матрицы
-    int[][] board = new int[8][8];
+    Integer[][] board = new Integer[8][8];
     //Установка стартовой позиции коня
-    int xCoord = 0, yCoord = 0;
-    board[yCoord][xCoord] = 1;
-    coordinatesTreeMap.put(0, new Coordinates(0, 0));
+    board[y][x] = 1;
+    coordinatesTreeMap.put(1, new Coordinates(x, y));
     //все возможные ходы коня
     int[][] all = {{1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}, {-2, 1}, {-1, 2}};
 
-    recFindPos(xCoord, yCoord, 1, all, board);
+    recFindPos(x, y, 2, all, board);
     //Вывод результата
     char letter;
     for (Coordinates coord : coordinatesTreeMap.values()) {
@@ -38,7 +39,6 @@ public class KnightsTourProblem {
       }
       System.out.println();
     }
-
   }
 
   /**
@@ -46,9 +46,9 @@ public class KnightsTourProblem {
    * если для следующего коня не находится ход, то ход действующего коня обнуляется, и ему подбирается другой ход
    */
 
-  private boolean recFindPos(int x, int y, int movei, int[][] all, int[][] board) {
+  private boolean recFindPos(int x, int y, int movei, int[][] all, Integer[][] board) {
     int next_x, next_y;
-    if (movei == 64) {
+    if (movei == 65) {
       for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
           coordinatesTreeMap.put(board[i][j], new Coordinates(j, i));
@@ -64,7 +64,7 @@ public class KnightsTourProblem {
         if (recFindPos(next_x, next_y, movei + 1, all, board))
           return true;
         else
-          board[next_x][next_y] = 0;
+          board[next_x][next_y] = null;
       }
     }
     return false;
@@ -74,7 +74,11 @@ public class KnightsTourProblem {
    * метод, определяющий, можно ли ставить коня на координаты x,y
    */
 
-  private boolean isSafe(int x, int y, int[][] board) {
-    return x >= 0 && x < 8 && y >= 0 && y < 8 && board[x][y] == 0;
+  private boolean isSafe(int x, int y, Integer[][] board) {
+    return x >= 0 && x < 8 && y >= 0 && y < 8 && board[x][y] == null;
+  }
+
+  private Coordinates getRandomCoord() {
+    return new Coordinates((int) (Math.random() * 7), (int) (Math.random() * 7));
   }
 }
