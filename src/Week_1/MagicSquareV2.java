@@ -1,3 +1,4 @@
+package Week_1;
 
 //Метод Москопула
 public class MagicSquareV2 {

@@ -1,3 +1,5 @@
+package Week_1;
+
 public class Coordinates {
 
  private int xCoord;
