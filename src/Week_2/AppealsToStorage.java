@@ -3,7 +3,6 @@ package Week_2;
 public class AppealsToStorage {
     public static void main(String[] args) {
         HashStorage hashStorage = HashStorage.getInstance();
-        hashStorage.fillData();
 
         for (int i = 0; i < 5; i++) {
             int finalI = i;
