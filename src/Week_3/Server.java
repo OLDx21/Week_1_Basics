@@ -6,50 +6,62 @@ import java.net.*;
 import java.io.*;
 
 public class Server extends Thread {
-    private ServerSocket serverSocket;
+  private ServerSocket serverSocket;
 
-    public Server(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
-        serverSocket.setSoTimeout(60000);
-    }
+  public Server(int port) throws IOException {
+    serverSocket = new ServerSocket(port);
+    serverSocket.setSoTimeout(60000);
+  }
 
-    @Override
-    public void run() {
-        while(true) {
-            try {
-                System.out.println("Ожидание клиента на порт " +
-                        serverSocket.getLocalPort() + "...");
-                Socket server = serverSocket.accept();
+  @Override
+  public void run() {
+    while (true) {
+      try {
+        System.out.println("Ожидание клиента на порт " +
+            serverSocket.getLocalPort() + "...");
+        Socket server = serverSocket.accept();
 
-                System.out.println("Просто подключается к " + server.getRemoteSocketAddress());
-                DataInputStream in = new DataInputStream(server.getInputStream());
+        System.out.println("Просто подключается к " + server.getRemoteSocketAddress());
+        ObjectInputStream in = new ObjectInputStream(server.getInputStream());
+        DataOutputStream out = new DataOutputStream(server.getOutputStream());
+        OutputStream output = new FileOutputStream("test.txt");
+        int fileSize = in.read();
 
-                DataOutputStream out = new DataOutputStream(server.getOutputStream());
-                out.writeUTF(getDataFromStorage(in.readUTF()));
-                server.close();
+        int bytesRead;
+        byte[] buffer = new byte[fileSize];
 
-            } catch (SocketTimeoutException s) {
-                System.out.println("Время сокета истекло!");
-                break;
-            } catch (IOException e) {
-                e.printStackTrace();
-                break;
-            }
+        for (int i =0; i<buffer.length; i++){
+          bytesRead = in.read(buffer);
+          output.write(buffer, 0, bytesRead);
         }
-    }
+        // Closing the FileOutputStream handle
+        output.close();
+        out.writeUTF(getDataFromStorage(buffer));
+        server.close();
 
-    public static void main(String [] args) {
-        int port = Integer.parseInt("6060");
-        try {
-            Thread t = new Server(port);
-            t.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+      } catch (SocketTimeoutException s) {
+        System.out.println("Время сокета истекло!");
+        break;
+      } catch (IOException e) {
+        e.printStackTrace();
+        break;
+      }
     }
+  }
 
-    private String getDataFromStorage(String key){
-        HashStorage hashStorage = HashStorage.getInstance();
-        return hashStorage.getDataByKey(key);
+  public static void main(String[] args) {
+    int port = Integer.parseInt("6060");
+    try {
+      Thread t = new Server(port);
+      t.start();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+  }
+
+  private String getDataFromStorage(byte[] file) {
+    String s = new String(file);
+    HashStorage hashStorage = HashStorage.getInstance();
+    return hashStorage.getDataByKey(s);
+  }
 }
