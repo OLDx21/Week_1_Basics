@@ -15,7 +15,7 @@ public class Server extends Thread {
 
     @Override
     public void run() {
-        while(true) {
+        while (true) {
             try {
                 System.out.println("Ожидание клиента на порт " +
                         serverSocket.getLocalPort() + "...");
@@ -23,9 +23,11 @@ public class Server extends Thread {
 
                 System.out.println("Просто подключается к " + server.getRemoteSocketAddress());
                 DataInputStream in = new DataInputStream(server.getInputStream());
+                byte[] request = in.readAllBytes();
 
                 DataOutputStream out = new DataOutputStream(server.getOutputStream());
-                out.writeUTF(getDataFromStorage(in.readUTF()));
+                out.writeUTF(getDataFromStorage(request));
+
                 server.close();
 
             } catch (SocketTimeoutException s) {
@@ -38,7 +40,7 @@ public class Server extends Thread {
         }
     }
 
-    public static void main(String [] args) {
+    public static void main(String[] args) {
         int port = Integer.parseInt("6060");
         try {
             Thread t = new Server(port);
@@ -48,8 +50,26 @@ public class Server extends Thread {
         }
     }
 
-    private String getDataFromStorage(String key){
+    private String getDataFromStorage(byte[] file) {
+        String s = new String(file);
         HashStorage hashStorage = HashStorage.getInstance();
-        return hashStorage.getDataByKey(key);
+        return hashStorage.getDataByKey(s);
+    }
+
+    private void requestHandler(Socket server) {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    if (server.getInputStream().readAllBytes() != null) {
+                        System.out.println("OK");
+                    } else {
+                        System.out.println("Ne ok");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
     }
 }
