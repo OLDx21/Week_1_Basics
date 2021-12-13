@@ -12,16 +12,14 @@ public class Client {
         try {
             System.out.println("Подключение к " + serverName + " на порт " + port);
             Socket client = new Socket(serverName, port);
+            ObjectOutputStream out = new ObjectOutputStream(client.getOutputStream());
+            DataInputStream in = new DataInputStream(client.getInputStream());
 
-            DatagramSocket i = new DatagramSocket(6060);
-            byte[] buffer = Files.readAllBytes(new File("/Users/mdemydovych/Downloads/test2.txt").toPath());
-            DatagramPacket datagramPacket = new DatagramPacket(buffer, 0, buffer.length, new InetSocketAddress("localhost", 6666));
-            i.send(datagramPacket);
-            i.close();
-
-            InputStream inFromServer = client.getInputStream();
-
-            DataInputStream in = new DataInputStream(inFromServer);
+            byte[] buffer = Files.readAllBytes(new File("C:\\Users\\maksum\\Desktop\\test2.txt").toPath());
+            out.write(buffer.length);
+            out.flush();
+            out.write(buffer);
+            out.flush();
 
             System.out.println("Результат запроса " + in.readUTF());
             client.close();
